@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe UsersController, type: :request do
+RSpec.describe "Users Endpoints", type: :request do
 
   describe "Post users" do
     context "with a valid username" do
