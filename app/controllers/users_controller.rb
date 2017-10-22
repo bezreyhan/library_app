@@ -4,7 +4,11 @@ class UsersController < ApplicationController
       user = User.create!(username: params[:username])
       render json: user
     rescue ActiveRecord::RecordInvalid => e
-      render json: {errors: e.message}, status: 400
+      if e.message == "Validation failed: Username has already been taken"
+        render json: {errors: e.message}, status: 409
+      else
+        render json: {errors: e.message}, status: 404
+      end
     end
   end
 end
