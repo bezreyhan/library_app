@@ -38,7 +38,7 @@ class BookOwnershipsController < ApplicationController
       book = Book.find(params[:book_id])
       ownership = BookOwnership.find_by!(user: user, book: book)
       ownership.destroy!
-      render json: 'ok', status: 204
+      head :no_content
     rescue ActiveRecord::RecordNotFound => e
       if e.message == "Couldn't find BookOwnership"
         render json: {errors: "User does not own that book"}, status: 404

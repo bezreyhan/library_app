@@ -143,7 +143,6 @@ RSpec.describe 'BookOwnerships Endpoints', type: :request do
 
       it 'return a status 204' do
         delete user_book_ownership_url(user_id: @user.id, book_id: @book.id)
-        puts response.body
         expect(response).to have_http_status(204)
       end
 
@@ -166,7 +165,6 @@ RSpec.describe 'BookOwnerships Endpoints', type: :request do
         user = User.create(username: 'test_user')
         book = Book.create(author: 'test_author', title: 'test_title')
         delete user_book_ownership_url(user_id: user.id, book_id: book.id)
-        puts response.body
         expect(response).to have_http_status(404)
       end
     end
