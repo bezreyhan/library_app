@@ -56,7 +56,6 @@ RSpec.describe 'BookOwnerships Endpoints', type: :request do
         book = Book.create!(author: 'test_author', title: 'test_title')
         BookOwnership.create!(user: user, book: book, read: false)
         post user_book_ownerships_url(user_id: user.id, book_id: book.id)
-        puts response.body
         expect(response).to have_http_status(409)
       end
     end
@@ -110,7 +109,7 @@ RSpec.describe 'BookOwnerships Endpoints', type: :request do
       end
     end
 
-    context 'with an invalud user_id' do
+    context 'with an invalid user_id' do
       before do
         book = Book.create(author: 'test_author', title: 'test_title')
         put user_book_ownership_url(user_id: 'fake_fake', book_id: book.id, read: true)
@@ -129,7 +128,44 @@ RSpec.describe 'BookOwnerships Endpoints', type: :request do
       end
 
       it 'returns status 404' do
-        puts "_+_+_+_+_+_+_+_+_+"
+        expect(response).to have_http_status(404)
+      end
+    end
+  end
+
+  describe 'DELETE user_book_ownership' do
+    context 'for a valid user and book' do
+      before do
+        @user = User.create!(username: 'test_user')
+        @book = Book.create!(author: 'test_author', title: 'test_title')
+        BookOwnership.create!(user: @user, book: @book, read: false)
+      end
+
+      it 'return a status 204' do
+        delete user_book_ownership_url(user_id: @user.id, book_id: @book.id)
+        puts response.body
+        expect(response).to have_http_status(204)
+      end
+
+      it 'deletes the book from the users library' do
+        delete user_book_ownership_url(user_id: @user.id, book_id: @book.id)
+        expect{@user.books.find(@book.id)}.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+
+    context 'when the user does not exist' do
+      it 'return a status 404' do
+        book = Book.create(author: 'test_author', title: 'test_title')
+        delete user_book_ownership_url(user_id: 'fake_fake', book_id: book.id)
+        expect(response).to have_http_status(404)
+      end
+    end
+
+    context 'when the user does not own the book' do
+      it 'return a status 404' do
+        user = User.create(username: 'test_user')
+        book = Book.create(author: 'test_author', title: 'test_title')
+        delete user_book_ownership_url(user_id: user.id, book_id: book.id)
         puts response.body
         expect(response).to have_http_status(404)
       end

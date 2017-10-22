@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   resources :users, only: [:create] do
     post 'books', to: 'book_ownerships#create', as: 'book_ownerships'
     put 'books/:book_id', to: 'book_ownerships#update', as: 'book_ownership'
+    delete 'books/:book_id', to: 'book_ownerships#delete'
   end
   resources :books, only: [:create]
 

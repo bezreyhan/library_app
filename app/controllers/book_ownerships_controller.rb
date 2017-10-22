@@ -31,4 +31,20 @@ class BookOwnershipsController < ApplicationController
       render json: {errors: e.message}, status: 404
     end
   end
+
+  def delete
+    begin
+      user = User.find(params[:user_id])
+      book = Book.find(params[:book_id])
+      ownership = BookOwnership.find_by!(user: user, book: book)
+      ownership.destroy!
+      render json: 'ok', status: 204
+    rescue ActiveRecord::RecordNotFound => e
+      if e.message == "Couldn't find BookOwnership"
+        render json: {errors: "User does not own that book"}, status: 404
+      else
+        render json: {errors: e.message}, status: 404
+      end
+    end
+  end
 end
