@@ -216,6 +216,46 @@ RSpec.describe 'BookOwnerships Endpoints', type: :request do
       end
     end
 
+    context 'that have a specific author' do
+      it 'returns a list of the users books that have the author' do
+        user = User.create!(username: 'user1')
+        book1 = Book.create!(author: 'author1', title: 'title1')
+        book2 = Book.create!(author: 'author2', title: 'title2')
+        ownership1 = BookOwnership.create!(user: user, book: book1, read: false)
+        ownership2 = BookOwnership.create!(user: user, book: book2, read: true)
+        get user_books_url(user_id: user.id, author: book1.author)
+        parsed = JSON.parse(response.body)
+        expect(parsed.length).to eql(1)
+        expect(parsed[0]['author']).to eql(book1.author)
+      end
+    end
+
+    context 'that have a read and author query' do
+      before do
+        @user = User.create!(username: 'user1')
+        @book1 = Book.create!(author: 'author1', title: 'title1')
+        @book2 = Book.create!(author: 'author2', title: 'title2')
+        @book3 = Book.create!(author: 'author3', title: 'title3')
+        @ownership1 = BookOwnership.create!(user: @user, book: @book1, read: false)
+        @ownership2 = BookOwnership.create!(user: @user, book: @book2, read: true)
+        @ownership3 = BookOwnership.create!(user: @user, book: @book3, read: true)
+
+      end
+
+      it 'returns a list with length 1' do
+        get user_books_url(user_id: @user.id, author: @book2.author, read: true)
+        parsed = JSON.parse(response.body)
+        expect(parsed.length).to eql(1)
+        expect(parsed[0]['author']).to eql(@book2.author)
+      end
+
+      it 'returns a list with length 0' do
+        get user_books_url(user_id: @user.id, author: @book2.author, read: false)
+        parsed = JSON.parse(response.body)
+        expect(parsed.length).to eql(0)
+      end
+    end
+
     context 'when the user is invalid' do
       it 'returns a status 404' do
         get user_books_url(user_id: 'fake_fake')

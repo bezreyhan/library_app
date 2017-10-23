@@ -3,7 +3,7 @@ class BookOwnershipsController < ApplicationController
     begin
       ownership = BookOwnership.create!(user_id: params[:user_id], book_id: params[:book_id], read: false)
       book = Book.find(params[:book_id])
-      render json: ownership.self_and_book_attrs
+      render json: ownership.with_book_attrs
     rescue ActiveRecord::RecordInvalid => e
       if e.message == "Validation failed: User already owns that book"
         render json: {errors: e.message}, status: 409
@@ -20,7 +20,7 @@ class BookOwnershipsController < ApplicationController
       book = Book.find(params[:id])
       ownership = BookOwnership.find_by!(user: user, book: book)
       ownership.update!(read: params[:read])
-      render json: ownership.self_and_book_attrs
+      render json: ownership.with_book_attrs
     rescue ActiveRecord::RecordNotFound => e
       if e.message == "Couldn't find BookOwnership"
         render json: {errors: "User does not own that book"}, status: 404
@@ -50,13 +50,14 @@ class BookOwnershipsController < ApplicationController
 
   def index
     begin
-      user = User.find(params[:user_id])
-      query = {user: user}
-      if params[:read]
-        query[:read] = params[:read]
+      user = User.find(params[:user_id]) # check to see that the user exists
+      query = params.permit(:user_id, :read)
+      ownerships = if params[:author]
+        then BookOwnership.where(query).joins(:book)
+                          .where(books: { author: params[:author] })
+        else BookOwnership.where(query)
       end
-      ownerships = BookOwnership.where(query).self_and_book_attrs
-      render json: ownerships
+      render json: ownerships.with_book_attrs
     rescue ActiveRecord::RecordNotFound => e
       render json: {errors: e.message}, status: 404
     end
