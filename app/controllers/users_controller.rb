@@ -5,9 +5,9 @@ class UsersController < ApplicationController
       render json: user
     rescue ActiveRecord::RecordInvalid => e
       if e.message == "Validation failed: Username has already been taken"
-        render json: {errors: e.message}, status: 409
+        render json: {error: e.message}, status: 409
       else
-        render json: {errors: e.message}, status: 404
+        render json: {error: e.message}, status: 404
       end
     end
   end
