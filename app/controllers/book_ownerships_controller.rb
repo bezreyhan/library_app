@@ -4,7 +4,6 @@ class BookOwnershipsController < ApplicationController
       user = User.find(params[:user_id])
       book = Book.find(params[:book_id])
       ownership = BookOwnership.create!(user: user, book: book, read: false)
-      book = Book.find(params[:book_id])
       render json: ownership.with_book_attrs
     rescue ActiveRecord::RecordInvalid => e
       if e.message == "Validation failed: User already owns that book"
