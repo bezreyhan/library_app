@@ -1,6 +1,9 @@
 # Library API for Headspace Challege
+## Dependencies
+- Ruby v2.3.1
+- Postgres v9.6.3
 
-### Requirements
+## Requirements
   - Create a user
     - Users must have a unique username, and can have a collection of books.
   - Create a book
@@ -10,7 +13,17 @@
   - Delete a book from a user’s library
   - List all books in a user's library (by author, by read, by read/unread status)
 
-# Endpoints
+## Getting Started
+First clone the repo then follow the following steps:
+```bash
+$ cd library_app
+$ bundle install # install dependencies
+$ rails db:create db:migrate # create the database and run the migrations
+$ rspec # run the tests
+$ rails server # run the server on port 3000
+```
+
+## Endpoints
 | Action | Endpoint | Parameters | Example |
 | ------ | ------ | ------ | ------ |
 | Create User | POST /users | username: string | `curl -X POST -H "Content-Type: application/json" -d '{"username":"user_1"}' http://localhost:3000/users`
